@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-96ss3yg)vw^7kkekrk$10-0zfzu6lp3(y4jom=z9m@sa6#8jdb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    "student-feedback-system-ip1k.onrender.com",
+    "127.0.0.1",
+    "localhost",
+]
 
 # Application definition
 
@@ -80,15 +83,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+import os
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'student_feedback_db_k67y',
-        'USER': 'student_feedback_db_k67y_user',
-        'PASSWORD': 'Hcjihzy9a4RiYvW1cQ8hKG0CAtHAYvxP',
-        'HOST': 'dpg-d8v9tpgg4nts738nskpg-a',
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
+    )
 }
 
 

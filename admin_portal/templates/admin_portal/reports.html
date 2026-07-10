@@ -1,0 +1,337 @@
+{% extends "admin_portal/base_admin.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+
+<h1 style="color:red;">THIS IS MY REPORT PAGE</h1>
+
+<h2 class="mb-4">
+    📈 Reports
+</h2>
+
+<hr class="my-5">
+
+<h3 class="mb-4">
+    📊 System Analytics
+</h3>
+
+<div class="row">
+
+    <div class="col-lg-7 mb-4">
+
+        <div class="card shadow h-100">
+
+            <div class="card-header bg-primary text-white">
+
+                <h5 class="mb-0">
+                    📊 Feedback by Course
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="feedbackChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-5 mb-4">
+
+        <div class="card shadow h-100">
+
+            <div class="card-header bg-success text-white">
+
+                <h5 class="mb-0">
+                    🥧 Complaint Categories
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <canvas id="complaintChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ⭐ ADD THE AVERAGE RATINGS CHART HERE -->
+
+<div class="card shadow mt-4">
+
+    <div class="card-header bg-dark text-white">
+
+        <h5 class="mb-0">
+
+            ⭐ Average Ratings
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        <canvas id="ratingChart"></canvas>
+
+    </div>
+
+</div>
+
+<p class="text-muted">
+    Generate and download reports from the Student Feedback Evaluation System.
+</p>
+
+<div class="row">
+
+    <div class="col-md-6 mb-4">
+
+        <div class="card shadow">
+
+            <div class="card-body text-center">
+
+                <h4>📄 PDF Report</h4>
+
+                <p>
+                    Download a summary of students, lecturers, courses and feedback.
+                </p>
+
+                <button class="btn btn-danger" disabled>
+
+                    Download PDF (Coming Soon)
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6 mb-4">
+
+        <div class="card shadow">
+
+            <div class="card-body text-center">
+
+                <h4>📊 Excel Report</h4>
+
+                <p>
+                    Export feedback data for further analysis.
+                </p>
+
+                <button class="btn btn-success" disabled>
+
+                    Download Excel (Coming Soon)
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+// =========================
+// Feedback by Course
+// =========================
+
+const feedbackCtx = document.getElementById('feedbackChart');
+
+if (feedbackCtx) {
+
+    new Chart(feedbackCtx, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: {{ feedback_labels|safe }},
+
+            datasets: [{
+
+                label: 'Number of Feedback',
+
+                data: {{ feedback_data|safe }},
+
+                backgroundColor: '#0d6efd'
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+
+                        precision: 0
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+
+// =========================
+// Complaint Categories
+// =========================
+
+const complaintCtx = document.getElementById('complaintChart');
+
+if (complaintCtx) {
+
+    new Chart(complaintCtx, {
+
+        type: 'pie',
+
+        data: {
+
+            labels: {{ complaint_labels|safe }},
+
+            datasets: [{
+
+                data: {{ complaint_data|safe }},
+
+                backgroundColor: [
+
+                    '#0d6efd',
+
+                    '#198754',
+
+                    '#ffc107',
+
+                    '#dc3545',
+
+                    '#6610f2'
+
+                ]
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true
+
+        }
+
+    });
+
+}
+
+
+// =========================
+// Average Ratings
+// =========================
+
+const ratingCtx = document.getElementById('ratingChart');
+
+if (ratingCtx) {
+
+    new Chart(ratingCtx, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: [
+
+                'Teaching',
+
+                'Communication',
+
+                'Punctuality',
+
+                'Course Materials'
+
+            ],
+
+            datasets: [{
+
+                label: 'Average Rating',
+
+                data: [
+
+                    {{ avg_teaching }},
+
+                    {{ avg_communication }},
+
+                    {{ avg_punctuality }},
+
+                    {{ avg_material }}
+
+                ],
+
+                backgroundColor: [
+
+                    '#0d6efd',
+
+                    '#198754',
+
+                    '#ffc107',
+
+                    '#dc3545'
+
+                ]
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    max: 5
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

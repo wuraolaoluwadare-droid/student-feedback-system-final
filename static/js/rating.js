@@ -1,41 +1,39 @@
-document.querySelectorAll(".rating").forEach(function(container){
+document.addEventListener("DOMContentLoaded", function () {
 
-    const fieldName = container.dataset.name;
+    document.querySelectorAll(".rating").forEach(function (container) {
 
-    const hiddenInput = document.getElementById(fieldName);
+        const fieldName = container.dataset.name;
+        const hiddenInput = document.getElementById(fieldName);
 
-    for(let i=1;i<=5;i++){
+        for (let i = 1; i <= 5; i++) {
 
-        let star=document.createElement("span");
+            const star = document.createElement("span");
 
-        star.innerHTML="★";
+            star.innerHTML = "★";
+            star.dataset.value = i;
 
-        star.dataset.value=i;
+            container.appendChild(star);
+        }
 
-        container.appendChild(star);
+        const stars = container.querySelectorAll("span");
 
-    }
+        stars.forEach(function (star) {
 
-    const stars=container.querySelectorAll("span");
+            star.addEventListener("click", function () {
 
-    stars.forEach(function(star){
+                if (hiddenInput) {
+                    hiddenInput.value = this.dataset.value;
+                }
 
-        star.addEventListener("click",function(){
+                stars.forEach(function (s) {
+                    s.style.color = "#d3d3d3";
+                });
 
-            hiddenInput.value=this.dataset.value;
+                for (let i = 0; i < Number(this.dataset.value); i++) {
+                    stars[i].style.color = "gold";
+                }
 
-            stars.forEach(function(s){
-
-                s.classList.remove("active");
-
-            });
-
-            for(let i=0;i<this.dataset.value;i++){
-
-                stars[i].classList.add("active");
-
-            }
-
+        });
         });
 
     });

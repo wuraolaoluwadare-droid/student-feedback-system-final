@@ -159,62 +159,6 @@
 
 <hr class="my-5">
 
-<hr class="my-5">
-
-<h3 class="mb-4">
-    📊 System Analytics
-</h3>
-
-<div class="row">
-
-    <div class="col-lg-7 mb-4">
-
-        <div class="card shadow h-100">
-
-            <div class="card-header bg-primary text-white">
-
-                <h5 class="mb-0">
-                    📊 Feedback by Course
-                </h5>
-
-            </div>
-
-            <div class="card-body">
-
-                <canvas id="feedbackChart"></canvas>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-lg-5 mb-4">
-
-        <div class="card shadow h-100">
-
-            <div class="card-header bg-success text-white">
-
-                <h5 class="mb-0">
-                    🥧 Complaint Categories
-                </h5>
-
-            </div>
-
-            <div class="card-body">
-
-                <canvas id="complaintChart"></canvas>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<hr class="my-5">
-
 <h4 class="mb-3">
     ⚡ Quick Access
 </h4>
@@ -258,61 +202,55 @@
 
 </div>
 
+
+{% endblock %}
+
+{% block scripts %}
 <script>
 
-<script>
-
-// =============================
+// =========================
 // Feedback by Course
-// =============================
+// =========================
 
-const feedbackCtx = document.getElementById("feedbackChart");
+const feedbackCtx = document.getElementById('feedbackChart');
 
-new Chart(feedbackCtx, {
+if (feedbackCtx) {
 
-    type: "bar",
+    new Chart(feedbackCtx, {
 
-    data: {
+        type: 'bar',
 
-        labels: {{ feedback_labels|safe }},
+        data: {
 
-        datasets: [{
+            labels: {{ feedback_labels|safe }},
 
-            label: "Feedback Submitted",
+            datasets: [{
 
-            data: {{ feedback_data|safe }},
+                label: 'Number of Feedback',
 
-            backgroundColor: "#0d6efd",
+                data: {{ feedback_data|safe }},
 
-            borderRadius: 6
+                backgroundColor: '#0d6efd'
 
-        }]
-
-    },
-
-    options: {
-
-        responsive: true,
-
-        plugins: {
-
-            legend: {
-
-                display: false
-
-            }
+            }]
 
         },
 
-        scales: {
+        options: {
 
-            y: {
+            responsive: true,
 
-                beginAtZero: true,
+            scales: {
 
-                ticks: {
+                y: {
 
-                    precision: 0
+                    beginAtZero: true,
+
+                    ticks: {
+
+                        precision: 0
+
+                    }
 
                 }
 
@@ -320,99 +258,139 @@ new Chart(feedbackCtx, {
 
         }
 
-    }
+    });
 
-});
+}
 
 
-// =============================
+// =========================
 // Complaint Categories
-// =============================
+// =========================
 
-const complaintCtx = document.getElementById("complaintChart");
+const complaintCtx = document.getElementById('complaintChart');
 
-new Chart(complaintCtx, {
+if (complaintCtx) {
 
-    type: "pie",
+    new Chart(complaintCtx, {
 
-    data: {
+        type: 'pie',
 
-        labels: {{ complaint_labels|safe }},
+        data: {
 
-        datasets: [{
+            labels: {{ complaint_labels|safe }},
 
-            data: {{ complaint_data|safe }},
+            datasets: [{
 
-            backgroundColor: [
+                data: {{ complaint_data|safe }},
 
-                "#0d6efd",
-                "#198754",
-                "#ffc107",
-                "#dc3545",
-                "#6610f2"
+                backgroundColor: [
 
-            ]
+                    '#0d6efd',
 
-        }]
+                    '#198754',
 
-    },
+                    '#ffc107',
 
-    options: {
+                    '#dc3545',
 
-        responsive: true
+                    '#6610f2'
 
-    }
+                ]
 
-});
+            }]
 
-<hr class="my-5">
+        },
 
-<h3 class="mb-4">
-    ⭐ Average Ratings
-</h3>
+        options: {
 
-<div class="row">
+            responsive: true
 
-    <div class="col-md-3 mb-3">
-        <div class="card border-primary shadow">
-            <div class="card-body text-center">
-                <h5>Teaching</h5>
-                <h2 class="text-primary">{{ avg_teaching }}/5</h2>
-            </div>
-        </div>
-    </div>
+        }
 
-    <div class="col-md-3 mb-3">
-        <div class="card border-success shadow">
-            <div class="card-body text-center">
-                <h5>Communication</h5>
-                <h2 class="text-success">{{ avg_communication }}/5</h2>
-            </div>
-        </div>
-    </div>
+    });
 
-    <div class="col-md-3 mb-3">
-        <div class="card border-warning shadow">
-            <div class="card-body text-center">
-                <h5>Punctuality</h5>
-                <h2 class="text-warning">{{ avg_punctuality }}/5</h2>
-            </div>
-        </div>
-    </div>
+}
 
-    <div class="col-md-3 mb-3">
-        <div class="card border-danger shadow">
-            <div class="card-body text-center">
-                <h5>Course Materials</h5>
-                <h2 class="text-danger">{{ avg_material }}/5</h2>
-            </div>
-        </div>
-    </div>
 
-</div>
+// =========================
+// Average Ratings
+// =========================
+
+const ratingCtx = document.getElementById('ratingChart');
+
+if (ratingCtx) {
+
+    new Chart(ratingCtx, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: [
+
+                'Teaching',
+
+                'Communication',
+
+                'Punctuality',
+
+                'Materials'
+
+            ],
+
+            datasets: [{
+
+                label: 'Average Rating',
+
+                data: [
+
+                    {{ avg_teaching }},
+
+                    {{ avg_communication }},
+
+                    {{ avg_punctuality }},
+
+                    {{ avg_material }}
+
+                ],
+
+                backgroundColor: [
+
+                    '#0d6efd',
+
+                    '#198754',
+
+                    '#ffc107',
+
+                    '#dc3545'
+
+                ]
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    max: 5
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
 
 </script>
-
-</script>
-
 {% endblock %}

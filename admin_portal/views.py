@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from matplotlib.style import context
 
 from student_app.models import Student
 from lecturer_app.models import Lecturer
@@ -50,10 +51,62 @@ def admin_login(request):
         "admin_portal/login.html"
     )
 
+from django.db.models import Count, Avg
 
-from django.db.models import Count
+def get_report_data():
 
+    # Feedback by course
+    course_feedback = (
+        Feedback.objects
+        .values("course__course_code")
+        .annotate(total=Count("id"))
+        .order_by("course__course_code")
+    )
 
+    feedback_labels = [
+        item["course__course_code"]
+        for item in course_feedback
+    ]
+
+    feedback_data = [
+        item["total"]
+        for item in course_feedback
+    ]
+
+    # Complaints
+    complaint_summary = (
+        AnonymousComplaint.objects
+        .values("category")
+        .annotate(total=Count("id"))
+    )
+
+    complaint_labels = [
+        item["category"]
+        for item in complaint_summary
+    ]
+
+    complaint_data = [
+        item["total"]
+        for item in complaint_summary
+    ]
+
+    averages = Feedback.objects.aggregate(
+        avg_teaching=Avg("teaching_rating"),
+        avg_communication=Avg("communication_rating"),
+        avg_punctuality=Avg("punctuality_rating"),
+        avg_material=Avg("course_material_rating"),
+    )
+
+    return {
+        "feedback_labels": feedback_labels,
+        "feedback_data": feedback_data,
+        "complaint_labels": complaint_labels,
+        "complaint_data": complaint_data,
+        "avg_teaching": round(averages["avg_teaching"] or 0, 1),
+        "avg_communication": round(averages["avg_communication"] or 0, 1),
+        "avg_punctuality": round(averages["avg_punctuality"] or 0, 1),
+        "avg_material": round(averages["avg_material"] or 0, 1),
+    }
 @login_required(login_url="admin_login")
 def admin_dashboard(request):
 
@@ -111,25 +164,14 @@ def admin_dashboard(request):
     )
 
     context = {
-
-        "student_count": student_count,
-        "lecturer_count": lecturer_count,
-        "course_count": course_count,
-        "feedback_count": feedback_count,
-        "complaint_count": complaint_count,
-
-        "feedback_labels": feedback_labels,
-        "feedback_data": feedback_data,
-
-        "complaint_labels": complaint_labels,
-        "complaint_data": complaint_data,
-
-        "avg_teaching": round(averages["avg_teaching"] or 0, 1),
-        "avg_communication": round(averages["avg_communication"] or 0, 1),
-        "avg_punctuality": round(averages["avg_punctuality"] or 0, 1),
-        "avg_material": round(averages["avg_material"] or 0, 1),
-
+    "student_count": student_count,
+    "lecturer_count": lecturer_count,
+    "course_count": course_count,
+    "feedback_count": feedback_count,
+    "complaint_count": complaint_count,
     }
+
+    context.update(get_report_data())
 
     return render(
         request,
@@ -139,7 +181,7 @@ def admin_dashboard(request):
 
 @login_required(login_url="admin_login")
 def manage_students(request):
-    ...
+
     if not request.user.is_staff:
         return redirect("login")
 
@@ -298,5 +340,72 @@ def manage_complaints(request):
     return render(
         request,
         "admin_portal/complaints.html",
+        context
+    )
+
+@login_required(login_url="admin_login")
+def lecturer_performance(request):
+
+    lecturers = Lecturer.objects.all()
+
+    performance = []
+
+    for lecturer in lecturers:
+
+        feedbacks = Feedback.objects.filter(
+            course__lecturer=lecturer
+        )
+
+        total = feedbacks.count()
+
+        averages = feedbacks.aggregate(
+            teaching=Avg("teaching_rating"),
+            communication=Avg("communication_rating"),
+            punctuality=Avg("punctuality_rating"),
+            material=Avg("course_material_rating"),
+        )
+
+        overall = (
+            (averages["teaching"] or 0) +
+            (averages["communication"] or 0) +
+            (averages["punctuality"] or 0) +
+            (averages["material"] or 0)
+        ) / 4
+
+        performance.append({
+            "lecturer": lecturer,
+            "feedbacks": total,
+            "teaching": round(averages["teaching"] or 0, 1),
+            "communication": round(averages["communication"] or 0, 1),
+            "punctuality": round(averages["punctuality"] or 0, 1),
+            "material": round(averages["material"] or 0, 1),
+            "overall": round(overall, 1),
+        })
+
+    performance = sorted(
+        performance,
+        key=lambda x: x["overall"],
+        reverse=True
+    )
+
+    return render(
+        request,
+        "admin_portal/lecturer_performance.html",
+        {
+            "performance": performance
+        }
+    )
+
+@login_required(login_url="admin_login")
+def reports(request):
+
+    if not request.user.is_staff:
+        return redirect("login")
+
+    context = get_report_data()
+
+    return render(
+        request,
+        "admin_portal/reports.html",
         context
     )

@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from matplotlib.style import context
 
 from student_app.models import Student
 from lecturer_app.models import Lecturer

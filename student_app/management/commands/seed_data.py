@@ -168,6 +168,24 @@ class Command(BaseCommand):
             )
         )
 
+        # ===========================
+        # ADMIN USER
+        # ===========================
+
+        admin_user, created = User.objects.get_or_create(
+            username="admin"
+        )
+
+        admin_user.set_password("admin123")
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.email = "admin@example.com"
+        admin_user.save()
+
+        self.stdout.write(
+            self.style.SUCCESS("✓ Administrator account created successfully.")
+)
+
         self.stdout.write(
             self.style.SUCCESS(
                 "===================================="
